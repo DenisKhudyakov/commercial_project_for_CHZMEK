@@ -1,49 +1,64 @@
-from tkinter import *
-from tkinter import ttk
+import tkinter as tk
 from tkinter import filedialog
+from functools import partial
+from src.utills import script_stages_and_form
 
 
 class Screen:
     """
     Класс управления скриптом через интерфейс
     """
-    pass
 
-root = Tk()
-root.title("METANIT.COM")
-root.geometry("250x200")
+    def __init__(self):
+        self.entry1 = None
+        self.label1 = None
+        self.browse_button1 = None
+        self.label2 = None
+        self.entry2 = None
+        self.browse_button2 = None
+        self.run_button = None
+        self.root = tk.Tk()
+        self.root.title("Запуск скрипта")
 
-root.grid_rowconfigure(index=0, weight=1)
-root.grid_columnconfigure(index=0, weight=1)
-root.grid_columnconfigure(index=1, weight=1)
+    @staticmethod
+    def browse_file(entry):
+        filename = filedialog.askopenfilename()
+        entry.delete(0, tk.END)
+        entry.insert(0, filename)
 
-text_editor = Text()
-text_editor.grid(column=0, columnspan=2, row=0)
+    @staticmethod
+    def run_script(entry1, entry2):
+        file1_path = entry1.get()
+        file2_path = entry2.get()
+        script_stages_and_form(file1_path, file2_path)
+
+    def widget(self):
+        # Создание и настройка виджетов
+        self.label1 = tk.Label(self.root, text="Вставьте формуляр:")
+        self.label1.grid(row=0, column=0)
+
+        self.entry1 = tk.Entry(self.root, width=50)
+        self.entry1.grid(row=0, column=1)
+
+        self.browse_button1 = tk.Button(self.root, text="Обзор", command=partial(self.browse_file, self.entry1))
+        self.browse_button1.grid(row=0, column=2)
+
+        self.label2 = tk.Label(self.root, text="Вставьте отчет по этапам:")
+        self.label2.grid(row=1, column=0)
+
+        self.entry2 = tk.Entry(self.root, width=50)
+        self.entry2.grid(row=1, column=1)
+
+        self.browse_button2 = tk.Button(self.root, text="Обзор", command=partial(self.browse_file, self.entry2))
+        self.browse_button2.grid(row=1, column=2)
+
+        self.run_button = tk.Button(self.root, text="Запустить скрипт", command=partial(self.run_script, self.entry1, self.entry2))
+        self.run_button.grid(row=2, column=1)
+
+        # Запуск основного цикла обработки событий
+        self.root.mainloop()
 
 
-# открываем файл в текстовое поле
-def open_file():
-    filepath = filedialog.askopenfilename()
-    if filepath != "":
-        with open(filepath, "r") as file:
-            text = file.read()
-            text_editor.delete("1.0", END)
-            text_editor.insert("1.0", text)
-
-
-# сохраняем текст из текстового поля в файл
-def save_file():
-    filepath = filedialog.asksaveasfilename()
-    if filepath != "":
-        text = text_editor.get("1.0", END)
-        with open(filepath, "w") as file:
-            file.write(text)
-
-
-open_button = ttk.Button(text="Открыть файл", command=open_file)
-open_button.grid(column=0, row=1, sticky=NSEW, padx=10)
-
-save_button = ttk.Button(text="Сохранить файл", command=save_file)
-save_button.grid(column=1, row=1, sticky=NSEW, padx=10)
-
-root.mainloop()
+if __name__ == '__main__':
+    start = Screen()
+    start.widget()
