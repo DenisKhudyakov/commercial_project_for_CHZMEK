@@ -2,6 +2,7 @@ import tkinter as tk
 from tkinter import filedialog
 from functools import partial
 from src.utills import script_stages_and_form
+import threading
 
 
 class Screen:
@@ -26,11 +27,11 @@ class Screen:
         entry.delete(0, tk.END)
         entry.insert(0, filename)
 
-    @staticmethod
-    def run_script(entry1, entry2):
+    def run_script(self, entry1, entry2):
         file1_path = entry1.get()
         file2_path = entry2.get()
         script_stages_and_form(file1_path, file2_path)
+        self.root.destroy()  # Закрываем окно после выполнения функции
 
     def widget(self):
         # Создание и настройка виджетов
@@ -52,13 +53,15 @@ class Screen:
         self.browse_button2 = tk.Button(self.root, text="Обзор", command=partial(self.browse_file, self.entry2))
         self.browse_button2.grid(row=1, column=2)
 
-        self.run_button = tk.Button(self.root, text="Запустить скрипт", command=partial(self.run_script, self.entry1, self.entry2))
+        self.run_button = tk.Button(self.root, text="Запустить скрипт",
+                                    command=partial(self.run_script, self.entry1, self.entry2))
         self.run_button.grid(row=2, column=1)
 
         # Запуск основного цикла обработки событий
-        self.root.mainloop()
+        self.root.wait_window()
 
 
 if __name__ == '__main__':
     start = Screen()
     start.widget()
+
